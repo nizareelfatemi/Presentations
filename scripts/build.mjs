@@ -1,7 +1,7 @@
 // Build : valide les présentations, les chiffre (AES-256-GCM, clé PBKDF2) et assemble dist/.
 // Usage : SITE_PASSWORD=... node scripts/build.mjs        (build complet)
 //         node scripts/build.mjs --check                 (validation seule, sans mot de passe)
-import { createCipheriv, createHash, pbkdf2Sync, randomBytes } from "node:crypto";
+import { createCipheriv, createHash, createHmac, pbkdf2Sync, randomBytes } from "node:crypto";
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -47,6 +47,7 @@ for (const d of dirs) {
     if (meta[k] !== undefined && !(Array.isArray(meta[k]) && meta[k].every((x) => typeof x === "string")))
       fail(id, `« ${k} » doit être une liste de textes`);
   if (meta.slides !== undefined && !(Number.isInteger(meta.slides) && meta.slides > 0)) fail(id, "« slides » doit être un entier > 0");
+  if (meta.shareRev !== undefined && !(Number.isInteger(meta.shareRev) && meta.shareRev >= 0)) fail(id, "« shareRev » doit être un entier >= 0");
 
   const html = await readFile(htmlPath);
   const local = [...html.toString("utf8").matchAll(/(?:src|href)\s*=\s*["'](?!https?:|data:|#|\/\/|mailto:|blob:|javascript:)([^"']+)["']/gi)].map((m) => m[1]);
@@ -60,6 +61,7 @@ for (const d of dirs) {
       duration: meta.duration, date: meta.date,
       level: meta.level ?? "", language: meta.language ?? "fr",
       tags: meta.tags ?? [], slides: meta.slides ?? null, outline: meta.outline ?? [],
+      shareRev: meta.shareRev ?? 0,
     },
   });
 }
@@ -87,9 +89,15 @@ if (!password) {
 const key = pbkdf2Sync(password, salt, ITERATIONS, 32, "sha256");
 
 // Format : IV (12 octets) || texte chiffré || tag GCM (16 octets), compatible WebCrypto.
-function encrypt(buf) {
+// Clé de partage : dérivée du mot de passe + identifiant + révision, propre à CHAQUE présentation.
+// Elle ne permet ni de retrouver la clé principale ni d'ouvrir une autre présentation.
+// Elle est stable d'un déploiement à l'autre : un lien déjà envoyé continue de fonctionner.
+// Pour révoquer un lien : incrémenter « shareRev » dans meta.json (ou changer le mot de passe pour tous).
+const shareKey = (id, rev) => createHmac("sha256", key).update(`share|${id}|${rev}`).digest();
+
+function encrypt(buf, k = key) {
   const iv = randomBytes(12);
-  const c = createCipheriv("aes-256-gcm", key, iv);
+  const c = createCipheriv("aes-256-gcm", k, iv);
   const body = Buffer.concat([c.update(buf), c.final()]);
   return Buffer.concat([iv, body, c.getAuthTag()]);
 }
@@ -101,7 +109,7 @@ await cp(path.join(ROOT, "site"), DIST, { recursive: true });
 
 for (const e of entries) {
   e.meta.file = fileName(e.id);
-  await writeFile(path.join(DIST, "data", `${e.meta.file}.bin`), encrypt(e.html));
+  await writeFile(path.join(DIST, "data", `${e.meta.file}.bin`), encrypt(e.html, shareKey(e.id, e.meta.shareRev)));
 }
 const index = {
   built: new Date().toISOString(),

@@ -39,10 +39,15 @@ Ce repo est une bibliothèque de présentations HTML publiée sur GitHub Pages. 
 | `language` | non | défaut `fr` |
 | `tags`, `outline` | non | listes de textes |
 | `slides` | non | entier > 0 |
+| `shareRev` | non | entier >= 0 (défaut 0). Incrémenter pour révoquer les liens de partage déjà envoyés |
 
 4. Si le domaine n'existe pas encore, ajoute-le dans `config/domains.json` (nom → couleur hex).
 5. Vérifie : `npm run check` (valide tout sans mot de passe).
 6. Commit puis push sur `main` : GitHub Actions valide, chiffre et déploie.
+
+## Liens de partage
+
+Chaque fiche a un bouton « Copier le lien de partage » : `…/play.html#<fichier>.<clé>`. Le lien ouvre directement la présentation en plein écran, **sans mot de passe**, et uniquement celle-ci. Rien à faire côté contenu : le build chiffre chaque présentation avec une clé propre, dérivée du mot de passe (HMAC), stable d'un déploiement à l'autre. Pour révoquer le lien d'une présentation : incrémenter `shareRev` dans son `meta.json` et redéployer (changer le mot de passe révoque tous les liens). Ne jamais écrire un lien de partage dans le repo.
 
 ## Règles
 
@@ -54,6 +59,6 @@ Ce repo est une bibliothèque de présentations HTML publiée sur GitHub Pages. 
 ## Structure
 
 - `presentations/<slug>/{index.html,meta.json}` — le contenu
-- `site/` — l'application (HTML/CSS/JS statique, sans dépendance)
+- `site/` — l'application (HTML/CSS/JS statique, sans dépendance) ; `site/play.html` est la page de lecture des liens de partage
 - `scripts/build.mjs` — validation + chiffrement → `dist/`
 - `.github/workflows/pages.yml` — déploiement (secret `SITE_PASSWORD`)

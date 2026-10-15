@@ -25,6 +25,14 @@ Bibliothèque de présentations HTML, publiée sur GitHub Pages, protégée par 
 
 Au quotidien : Claude ajoute un dossier, tu fais `git push`, le site se met à jour en environ une minute.
 
+## Partager une présentation sans mot de passe
+
+Dans la fiche d'une présentation, **🔗 Copier le lien de partage** copie une adresse du type `https://<ton-user>.github.io/<repo>/play.html#<fichier>.<clé>`. La personne qui l'ouvre arrive directement en mode présentation (plein écran avec la touche P), sans mot de passe et sans accès au reste de la bibliothèque.
+
+- La clé est dans la partie après `#` : elle n'est jamais envoyée au serveur. Elle est dérivée du mot de passe (HMAC-SHA256) pour chaque présentation, donc elle ne donne accès qu'à celle-là et elle reste valable après chaque nouveau déploiement.
+- **Révoquer** : incrémente `shareRev` dans le `meta.json` de la présentation (nouveau lien, l'ancien ne marche plus), ou change le mot de passe pour révoquer tous les liens.
+- Toute personne qui a le lien peut le retransmettre : ne l'envoie qu'aux destinataires prévus.
+
 ## Limites de la protection (à lire)
 
 - **Mot de passe de secours.** Si le secret `SITE_PASSWORD` n'est pas défini, le build utilise `12345678`. Ce mot de passe est écrit dans `scripts/build.mjs` : toute personne qui lit le code le connaît. Le site est alors chiffré mais pas protégé. Définis le secret dès le premier déploiement.
@@ -51,7 +59,7 @@ Aucune dépendance à installer (Node 20 ou plus).
 presentations/<slug>/{index.html,meta.json}   contenu
 config/domains.json                           domaines autorisés et couleurs
 config/salt.txt                               sel PBKDF2 (public, ne pas changer sans raison)
-site/                                         l'application statique
+site/                                         l'application statique (+ play.html : lecture des liens de partage)
 scripts/build.mjs                             validation + chiffrement
 .github/workflows/pages.yml                   déploiement
 CLAUDE.md                                     consignes pour Claude

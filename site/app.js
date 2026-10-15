@@ -6,7 +6,7 @@ const b64 = (u8) => btoa(String.fromCharCode(...u8));
 const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 const KEY_STORE = "sdp.key";
 
-let vault, key, data;
+let vault, key, rawKey, data;
 
 /* ---------- crypto ---------- */
 async function deriveRaw(password) {
@@ -16,12 +16,18 @@ async function deriveRaw(password) {
   return new Uint8Array(bits);
 }
 const toKey = (raw) => crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["decrypt"]);
+const b64url = (u8) => b64(u8).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+// Clé propre à une présentation (même formule que scripts/build.mjs).
+async function shareKey(p) {
+  const h = await crypto.subtle.importKey("raw", rawKey, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return new Uint8Array(await crypto.subtle.sign("HMAC", h, new TextEncoder().encode(`share|${p.id}|${p.shareRev ?? 0}`)));
+}
 
-async function decryptFile(name) {
+async function decryptFile(name, k = key) {
   const r = await fetch(`data/${name}`, { cache: "no-cache" });
   if (!r.ok) throw new Error("fichier introuvable");
   const buf = new Uint8Array(await r.arrayBuffer());
-  return crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.slice(0, 12) }, key, buf.slice(12));
+  return crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.slice(0, 12) }, k, buf.slice(12));
 }
 
 /* ---------- stockage de la clé (jamais le mot de passe) ---------- */
@@ -38,6 +44,7 @@ function clearKey() {
 /* ---------- démarrage / connexion ---------- */
 async function unlock(raw) {
   key = await toKey(raw);
+  rawKey = raw;
   data = JSON.parse(new TextDecoder().decode(await decryptFile("index.bin")));
 }
 
@@ -157,7 +164,8 @@ function openDrawer(id) {
   const d = $("#drawer");
   d.innerHTML = `<button class="close" id="dc" aria-label="Fermer">✕</button>${thumb(p, p.domain)}
   <div class="dbody"><h2>${esc(p.title)}</h2><p>${esc(p.summary)}</p>
-  <div class="go"><button class="btn primary" id="present">▶ Présenter</button></div>
+  <div class="go"><button class="btn primary" id="present">▶ Présenter</button><button class="btn" id="share">🔗 Copier le lien de partage</button></div>
+  <div class="share" id="shareBox" hidden><input id="shareUrl" readonly aria-label="Lien de partage" spellcheck="false"><p>Ce lien ouvre directement cette présentation en mode présentation, sans mot de passe, et uniquement celle-ci. Pour le révoquer, incrémente <code>shareRev</code> dans son <code>meta.json</code>.</p></div>
   <dl><dt>Domaine</dt><dd>${esc(p.domain)}</dd><dt>Audience</dt><dd>${esc(p.audience)}</dd>
   <dt>Durée</dt><dd>${fmt(p.duration)}${p.slides ? ` · ${p.slides} slides` : ""}</dd>
   ${p.level ? `<dt>Niveau</dt><dd>${esc(p.level)}</dd>` : ""}<dt>Langue</dt><dd>${esc(p.language.toUpperCase())}</dd>
@@ -169,6 +177,17 @@ function openDrawer(id) {
   history.replaceState(null, "", "#" + encodeURIComponent(id));
   $("#dc").onclick = closeDrawer;
   $("#present").onclick = () => present(p);
+  $("#share").onclick = () => shareLink(p);
+}
+async function shareLink(p) {
+  const base = location.origin + location.pathname.replace(/[^/]*$/, "");
+  const url = `${base}play.html#${p.file}.${b64url(await shareKey(p))}`;
+  const box = $("#shareBox"), input = $("#shareUrl"), btn = $("#share");
+  input.value = url; box.hidden = false;
+  let copied = false;
+  try { await navigator.clipboard.writeText(url); copied = true; } catch { input.select(); }
+  btn.textContent = copied ? "✓ Lien copié" : "🔗 Copie le lien ci-dessous";
+  setTimeout(() => { btn.textContent = "🔗 Copier le lien de partage"; }, 2500);
 }
 function closeDrawer() {
   $("#drawer").classList.remove("on"); $("#scrim").classList.remove("on"); $("#drawer").setAttribute("aria-hidden", "true");
@@ -185,7 +204,7 @@ async function present(p) {
   $("#stClock").textContent = "00:00"; $("#stProg").style.width = "0"; $("#stProg").classList.remove("over");
   $("#stLoad").hidden = false; frame.hidden = true;
   try {
-    const html = new TextDecoder().decode(await decryptFile(`${p.file}.bin`));
+    const html = new TextDecoder().decode(await decryptFile(`${p.file}.bin`, await toKey(await shareKey(p))));
     blobUrl = URL.createObjectURL(new Blob([html], { type: "text/html" }));
     // sandbox sans allow-same-origin : la présentation ne peut pas lire la clé stockée par l’app.
     frame.onload = () => { $("#stLoad").hidden = true; frame.hidden = false; frame.focus(); };
