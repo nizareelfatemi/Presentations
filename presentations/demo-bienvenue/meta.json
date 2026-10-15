@@ -1,0 +1,13 @@
+{
+  "title": "Bienvenue dans la Salle des présentations",
+  "summary": "Présentation d’exemple pour vérifier que le site fonctionne. À supprimer ensuite.",
+  "domain": "Formation",
+  "audience": "Moi",
+  "duration": 5,
+  "level": "Débutant",
+  "language": "fr",
+  "date": "2026-10-15",
+  "tags": ["démo"],
+  "slides": 4,
+  "outline": ["Accueil", "Format d’une présentation", "Chiffrement", "Suite"]
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bienvenue dans la Salle des présentations</title>
+<style>
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%;background:#0d111c;color:#e8ecf6;font-family:system-ui,"Segoe UI",sans-serif;overflow:hidden}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:8vw;gap:2.5vw}
+  .slide.on{display:flex}
+  h1{font-size:clamp(32px,6vw,84px);line-height:1.05;letter-spacing:-.02em;max-width:18ch}
+  h2{font-size:clamp(26px,4.4vw,58px);line-height:1.1;max-width:20ch}
+  p,li{font-size:clamp(16px,2.2vw,30px);line-height:1.4;color:#b4bdd4;max-width:34ch}
+  ul{padding-left:1.2em;display:grid;gap:1vw}
+  em{color:#7d90ff;font-style:normal}
+  .n{position:fixed;right:2vw;bottom:1.5vw;font:14px ui-monospace,monospace;color:#6c7794}
+  .bar{position:fixed;left:0;top:0;height:4px;background:#7d90ff;transition:width .2s}
+</style>
+</head>
+<body>
+<section class="slide on"><h1>Bienvenue dans la <em>Salle des présentations</em></h1><p>Exemple de présentation. Utilise les flèches ← → ou la barre d’espace.</p></section>
+<section class="slide"><h2>Une présentation = un seul fichier HTML</h2><ul><li>Styles et scripts embarqués</li><li>Images en data URI</li><li>Aucune dépendance locale</li></ul></section>
+<section class="slide"><h2>Tout est <em>chiffré</em> avant la mise en ligne</h2><p>Sans le mot de passe, le site ne publie que des fichiers illisibles.</p></section>
+<section class="slide"><h2>À toi de jouer</h2><p>Supprime ce dossier quand tu as tes propres présentations.</p></section>
+<div class="bar" id="bar"></div><div class="n" id="n"></div>
+<script>
+  const s=[...document.querySelectorAll(".slide")];let i=0;
+  function go(k){i=Math.max(0,Math.min(s.length-1,k));s.forEach((e,j)=>e.classList.toggle("on",j===i));
+    bar.style.width=((i+1)/s.length*100)+"%";n.textContent=(i+1)+" / "+s.length}
+  addEventListener("keydown",e=>{if(["ArrowRight"," ","PageDown"].includes(e.key))go(i+1);if(["ArrowLeft","PageUp"].includes(e.key))go(i-1)});
+  addEventListener("click",e=>go(e.clientX>innerWidth/3?i+1:i-1));
+  go(0);
+</script>
+</body>
+</html>
