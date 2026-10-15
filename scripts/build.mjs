@@ -73,9 +73,15 @@ console.log(`✓ ${entries.length} présentation(s) valide(s)`);
 if (checkOnly) process.exit(0);
 
 // ---------- chiffrement ----------
-const password = process.env.SITE_PASSWORD ?? "";
-if (password.length < MIN_PASSWORD) {
-  console.error(`\nSITE_PASSWORD absent ou trop court (minimum ${MIN_PASSWORD} caractères). Définis-le dans les secrets GitHub (voir README).\n`);
+// Mot de passe de secours : utilisé uniquement si le secret SITE_PASSWORD n'est pas défini.
+// Il est public (présent dans ce code) : il ne protège rien. Définis le secret SITE_PASSWORD.
+const FALLBACK_PASSWORD = "12345678";
+let password = process.env.SITE_PASSWORD ?? "";
+if (!password) {
+  password = FALLBACK_PASSWORD;
+  console.warn("\n⚠ SITE_PASSWORD non défini : mot de passe de secours public (12345678) utilisé. Le site n'est PAS réellement protégé tant que tu n'as pas défini le secret.\n");
+} else if (password.length < MIN_PASSWORD) {
+  console.error(`\nSITE_PASSWORD trop court (minimum ${MIN_PASSWORD} caractères).\n`);
   process.exit(1);
 }
 const key = pbkdf2Sync(password, salt, ITERATIONS, 32, "sha256");

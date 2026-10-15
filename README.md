@@ -18,7 +18,7 @@ Bibliothèque de présentations HTML, publiée sur GitHub Pages, protégée par 
    git push -u origin main
    ```
 2. **Ajoute le mot de passe** : repo → *Settings* → *Secrets and variables* → *Actions* → *New repository secret*.
-   Nom : `SITE_PASSWORD`. Valeur : une phrase de passe longue (12 caractères minimum, 5 mots au hasard recommandés).
+   Nom : `SITE_PASSWORD`. Valeur : une phrase de passe longue (12 caractères minimum, 5 mots au hasard recommandés). Sans ce secret, le mot de passe de secours public `12345678` est utilisé.
 3. **Active Pages** : repo → *Settings* → *Pages* → *Build and deployment* → *Source* : **GitHub Actions**.
 4. **Lance le déploiement** : onglet *Actions* → *Déployer sur GitHub Pages* → *Run workflow* (ou fais un push).
 5. L'adresse du site apparaît à la fin du job : `https://<ton-user>.github.io/salle-des-presentations/`.
@@ -26,6 +26,8 @@ Bibliothèque de présentations HTML, publiée sur GitHub Pages, protégée par 
 Au quotidien : Claude ajoute un dossier, tu fais `git push`, le site se met à jour en environ une minute.
 
 ## Limites de la protection (à lire)
+
+- **Mot de passe de secours.** Si le secret `SITE_PASSWORD` n'est pas défini, le build utilise `12345678`. Ce mot de passe est écrit dans `scripts/build.mjs` : toute personne qui lit le code le connaît. Le site est alors chiffré mais pas protégé. Définis le secret dès le premier déploiement.
 
 - **Repo privé et plan GitHub.** Sur GitHub Free, Pages ne fonctionne qu'avec un repo **public**. Dans ce cas, les fichiers sources (`presentations/*/index.html`) sont lisibles par tout le monde sur GitHub et le chiffrement ne protège que le site déployé. Pour un vrai secret, utilise un repo privé : il faut GitHub Pro, Team ou Enterprise (Pages sur repo privé).
 - **Même avec un repo privé, l'URL du site est publique.** Seul le contenu est protégé : n'importe qui peut télécharger les `.bin`, donc la solidité repose sur le mot de passe. Choisis une phrase de passe longue et unique.
