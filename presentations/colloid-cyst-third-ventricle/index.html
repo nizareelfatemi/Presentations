@@ -123,10 +123,18 @@ ul.pts.sm li{font-size:1.5cqw}ul.pts.sm li::before{top:.55cqw}
 .nhb img{height:3.6cqw;width:auto;mix-blend-mode:multiply}
 .nhb div{font-size:1.2cqw;line-height:1.4;border-left:.1cqw solid var(--ln);padding-left:1.8cqw}
 .nhb b{font-weight:800}.nhb em{font-style:normal;font-weight:800;font-size:1.5cqw;color:var(--ac2)}
+.rec.sm{padding-top:.7cqw;grid-template-columns:4cqw 1fr;gap:1.1cqw}.rec.sm b{font-size:3.2cqw}.rec.sm h3{font-size:1.5cqw}.rec.sm p{font-size:1.2cqw;margin-top:.25cqw;color:var(--mu)}
+.tbl.tight td{padding:.4cqw 1.2cqw}
+.cmp{width:100%;border-collapse:collapse;table-layout:fixed}
+.cmp th{font-size:1cqw;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);font-weight:700;text-align:center;padding:.4cqw .5cqw .6cqw;border-bottom:.2cqw solid var(--ink);line-height:1.25}
+.cmp td{padding:.55cqw .5cqw;text-align:center;font-size:1.85cqw;font-weight:800;letter-spacing:-.03em;color:var(--ac2);border-bottom:.1cqw solid var(--ln);white-space:nowrap}
+.cmp td.l{text-align:left;font-size:1cqw;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);font-weight:700;white-space:normal;line-height:1.25}
+.cmp tr.pool td:not(.l){color:var(--ac)}
+.cmp tr:last-child td{border-bottom:.2cqw solid var(--ink)}
 .stats{display:grid;gap:2cqw}
 .stat{border-top:.4cqw solid var(--ac);padding-top:1.2cqw}
 .stat b{display:block;font-size:4.6cqw;line-height:1;font-weight:800;color:var(--ac2);letter-spacing:-.03em}
-.stat span{display:block;margin-top:.8cqw;font-size:1.45cqw;color:var(--mu);line-height:1.35}
+.stat span{display:block;margin-top:.8cqw;font-size:var(--sp,1.45cqw);color:var(--mu);line-height:1.35}
 .stat.k{border-top-color:var(--ac2)}
 .stat.w b{color:var(--ac)}
 .big{font-size:11cqw;line-height:.9;font-weight:800;color:var(--ac2);letter-spacing:-.05em}
@@ -200,7 +208,9 @@ S.push({html:`${hd('Background','Pathology and epidemiology')}
     <div class="stat"><b>0.5–2%</b><span>of primary intracranial tumors</span></div>
     <div class="stat k"><b>0.9–3.2</b><span>cases per million inhabitants per year</span></div></div>
   </div>
-  <div class="w15" style="display:flex;align-items:center;min-width:0">${pic('kol','Colloid cyst at the foramen of Monro: sagittal T2 MRI (arrow) and anatomical plate','wm','')}</div>
+  <div class="w15" style="display:flex;flex-direction:column;justify-content:center;gap:2cqw;min-width:0">${pic('kol','Colloid cyst at the foramen of Monro: sagittal T2 MRI (arrow) and anatomical plate','wm','width:60%')}
+   <div class="card" style="border-left-color:var(--ac2);padding:1cqw 1.8cqw"><small style="color:var(--ac2);margin-bottom:.4cqw">Central question</small><p style="font-size:1.5cqw;line-height:1.3">How can surgical effectiveness be balanced: neurological preservation and long-term recurrence control?</p>
+   <p style="font-size:1.1cqw;font-weight:500;color:var(--mu);margin-top:.6cqw;line-height:1.35">This talk covers: risk criteria for acute deterioration, the comparative merits of open microsurgery versus neuroendoscopy, safety and recurrence data, and the four-point Colloid Cyst Extent of Resection Grade (CcERG) to standardize recurrence reporting.</p></div></div>
  </div>`});
 
 /* 3 Imaging */
@@ -252,41 +262,45 @@ S.push({html:`${hd('Special population','Pediatric colloid cysts')}
 
 /* 6 Microsurgery */
 S.push({html:`${hd('Surgical options','Open microsurgery: transcallosal vs transcortical')}
- <div class="grid2" style="margin-top:2cqw">
+ <div class="sub" style="margin-top:.6cqw;font-size:1.4cqw;max-width:88cqw"><b>Indications:</b> preferred for giant, heavily adherent, or anatomically complex cysts, or when ventricles are not enlarged.</div>
+ <div class="grid2" style="margin-top:1.3cqw">
   <div class="panel"><h3>Interhemispheric transcallosal (IHTC)</h3>
    <ul><li>Preferred without major ventriculomegaly</li><li>Direct access to the roof of the third ventricle, no cortical incision</li><li class="res" style="font-weight:700">Risks: fornix, cingulate gyrus, pericallosal arteries, sagittal draining veins</li></ul></div>
   <div class="panel g"><h3>Transcortical transventricular (TCTV)</h3>
    <ul><li>Preferred with markedly dilated ventricles</li><li class="res" style="font-weight:700">Higher risk of post-operative seizures after corticectomy</li></ul></div>
  </div>
- <div class="anchor"><div class="stats" style="grid-template-columns:repeat(5,1fr)">
-  <div class="stat"><b style="font-size:2.9cqw;white-space:nowrap">90–97%</b><span>primary gross-total resection (GTR)</span></div>
-  <div class="stat k"><b style="font-size:2.9cqw;white-space:nowrap">&lt; 1.5%</b><span>primary recurrence</span></div>
-  <div class="stat"><b style="font-size:2.9cqw;white-space:nowrap">4.9–5.2 h</b><span>operative time</span></div>
-  <div class="stat k"><b style="font-size:2.9cqw;white-space:nowrap">16.3–33.1%</b><span>overall morbidity</span></div>
-  <div class="stat"><b style="font-size:2.9cqw;white-space:nowrap">8.9 d</b><span>hospital stay</span></div>
- </div></div>`});
+ <div class="anchor"><table class="cmp"><colgroup><col style="width:16%"><col style="width:14%"><col style="width:14%"><col style="width:14%"><col style="width:14%"><col style="width:14%"><col style="width:14%"></colgroup>
+  <thead><tr><th></th><th>Gross-total resection</th><th>Recurrence</th><th>Operative time</th><th>Hospital stay</th><th>Complications / morbidity</th><th>Shunt dependency</th></tr></thead>
+  <tbody><tr><td class="l">Reported range</td><td>90–97%</td><td>&lt; 1.5%</td><td>4.9–5.2 h</td><td>8.9 d</td><td>16.3–33.1%</td><td>3.9–8.9%</td></tr>
+  <tr class="pool"><td class="l">Pooled estimate</td><td>~98.15%</td><td>0.00%</td><td>~194 min</td><td>~7.85 d</td><td>~20.68%</td><td>~4.75%</td></tr></tbody></table></div>`});
 
 /* 8 Endoscopy routes */
 S.push({html:`${hd('Surgical options','Neuroendoscopy: access routes')}
- <div class="body">
-  <div class="col w15">
-   <div class="stats" style="grid-template-columns:repeat(3,1fr);gap:1.6cqw">
-    <div class="stat"><b style="font-size:3.8cqw">94.7%</b><span>of cases use the <b style="display:inline;font-size:inherit;color:var(--ink)">transforaminal</b> route (most used)</span></div>
-    <div class="stat k"><b style="font-size:3.8cqw">88.4%</b><span>GTR via the transforaminal route</span></div>
-    <div class="stat"><b style="font-size:3.8cqw">86.9%</b><span>GTR via the <b style="display:inline;font-size:inherit;color:var(--ink)">transseptal</b> route</span></div></div>
-   <div class="card"><small>Classic entry point</small><p>3.5–4 cm from the midline and 5 cm in front of the coronal suture</p></div>
+ <div class="sub" style="margin-top:.6cqw;font-size:1.4cqw;max-width:88cqw"><b>Indications:</b> a safe, effective first-line treatment, particularly with favorable or dilated ventricular anatomy.</div>
+ <div class="body" style="margin-top:1.6cqw">
+  <div class="col" style="gap:1.3cqw;flex:2">
+   <div class="stats" style="grid-template-columns:repeat(3,1fr);gap:1.6cqw;--sp:1.2cqw">
+    <div class="stat"><b style="font-size:3cqw">94.7%</b><span>of cases use the <b style="display:inline;font-size:inherit;color:var(--ink)">transfrontal transforaminal</b> route (most used)</span></div>
+    <div class="stat k"><b style="font-size:3cqw">88.4%</b><span>GTR via the transforaminal route</span></div>
+    <div class="stat"><b style="font-size:3cqw">86.9%</b><span>GTR via the <b style="display:inline;font-size:inherit;color:var(--ink)">transseptal</b> route</span></div></div>
+   <div class="card" style="padding:.9cqw 2cqw"><small style="margin-bottom:.3cqw">Entry point and instruments</small><p style="font-size:1.3cqw;line-height:1.3">3.5–4 cm from the midline and 5 cm in front of the coronal suture. Rigid or flexible endoscopes; cyst aspiration, wall coagulation and rotational-pull (swiveling) removal.</p></div>
   </div>
   <div class="w1" style="display:flex">${pic('endo','Transforaminal route: endoscopic views, aspiration and capsule coagulation','zy','flex:1')}</div>
- </div>`});
+ </div>
+ <div class="anchor" style="padding-top:1.6cqw"><table class="cmp"><colgroup><col style="width:16%"><col style="width:14%"><col style="width:14%"><col style="width:14%"><col style="width:14%"><col style="width:14%"><col style="width:14%"></colgroup>
+  <thead><tr><th></th><th>Gross-total resection</th><th>Recurrence</th><th>Operative time</th><th>Hospital stay</th><th>Complications / morbidity</th><th>Shunt dependency</th></tr></thead>
+  <tbody><tr><td class="l">Reported range</td><td>68.3–88.4%</td><td>3.7%</td><td>3.0 h</td><td>4.1 d</td><td>6.1–10.5%</td><td>2.1–6.3%</td></tr>
+  <tr class="pool"><td class="l">Pooled estimate</td><td>~91.29%</td><td>~1.78%</td><td>~113 min</td><td>~4.69 d</td><td>~10.42%</td><td>~1.46%</td></tr></tbody></table></div>`});
 
 /* 9 Swiveling */
 S.push({html:`${hd('Surgical options','Swiveling technique')}
  <div class="body">
-  <div class="col w15" style="gap:1.5cqw">
-   <div class="rec"><b>1</b><div><h3>Puncture and aspiration of the mucinous content</h3></div></div>
-   <div class="rec"><b>2</b><div><h3>Firm grasp of the cyst wall with forceps</h3></div></div>
-   <div class="rec"><b>3</b><div><h3>Gentle rotation/twisting movements detach the capsule from the roof of the third ventricle</h3></div></div>
-   <div class="card" style="border-left-color:var(--ac2)"><small style="color:var(--ac2)">Goal</small><p>No excessive thermal or mechanical traction on the fornix pillars</p></div>
+  <div class="col w15" style="gap:1.1cqw">
+   <div class="rec sm"><b>1</b><div><h3>Plan the trajectory precisely</h3></div></div>
+   <div class="rec sm"><b>2</b><div><h3>Puncture and aspiration of the mucinous content</h3><p>Aspiration may be difficult if the content is viscous</p></div></div>
+   <div class="rec sm"><b>3</b><div><h3>Firm grasp of the cyst wall with forceps</h3></div></div>
+   <div class="rec sm"><b>4</b><div><h3>Gentle rotation/twisting (swiveling) detaches the capsule from the roof of the third ventricle</h3></div></div>
+   <div class="card" style="border-left-color:var(--ac2);padding:1.2cqw 2.2cqw"><small style="color:var(--ac2);margin-bottom:.4cqw">Goal</small><p style="font-size:1.6cqw">Minimize traction on the fornix during capsular dissection: no excessive thermal or mechanical traction on the fornix pillars</p></div>
   </div>
   <div class="w1" style="display:flex;flex-direction:column;gap:2cqw">${pic('sw1','Transseptal route: endoscopic views','zy','flex:1')}${pic('sw2','Interforniceal route: endoscopic views','zy','flex:1')}</div>
  </div>`});
@@ -304,25 +318,27 @@ S.push({html:`${hd('Other options','Stereotactic aspiration and CSF diversion')}
 
 /* 9 Table A */
 S.push({html:`${hd('Comparative results (1/2)','Efficacy and efficiency')}
- <table class="tbl"><thead><tr><th style="width:25%">Parameter</th><th style="width:26%">Neuroendoscopy</th><th style="width:22%">Open microsurgery (IHTC / TCTV)</th><th>Significance</th></tr></thead><tbody>
+ <table class="tbl tight" style="margin-top:1.4cqw"><thead><tr><th style="width:21%">Parameter</th><th style="width:19%">Neuroendoscopy</th><th style="width:20%">Open microsurgery (IHTC / TCTV)</th><th>Significance</th></tr></thead><tbody>
  <tr><td>Mean operative time</td><td class="win">3.0 ± 0.9 h</td><td>5.2 ± 1.3 h</td><td class="p">p &lt; 0.001 (endoscopy faster)</td></tr>
  <tr><td>Gross-total resection (GTR)</td><td>68.3% – 88.4%</td><td class="win">90.0% – 97.0%</td><td class="p">Higher radical resection with microsurgery</td></tr>
  <tr><td>Coagulated capsular remnants</td><td>17.1% – 63.6%</td><td class="win">19.0%</td><td class="p">p &lt; 0.001 (remnants more frequent with endoscopy)</td></tr>
  <tr><td>Length of stay (LOS)</td><td class="win">4.1 ± 1.9 days</td><td>8.9 ± 7.5 days</td><td class="p">p &lt; 0.001 (reduction &gt; 50%)</td></tr>
  <tr><td>Mean hospitalization cost</td><td class="win">$22,493 USD</td><td>$47,463 USD</td><td class="p">p = 0.0003 (saving &gt; 50% per patient)</td></tr>
  </tbody></table>
- <div class="note">Neuroendoscopy: 100% of patients discharged home. Green = more favorable value.</div>`});
+ <div class="note">Neuroendoscopy: 100% of patients discharged home. Green = more favorable value.</div>
+ <div class="note" style="margin-top:1.2cqw;font-size:1.4cqw;color:var(--ink);border-left:.4cqw solid var(--ac2);padding-left:1.4cqw;line-height:1.35"><b style="color:var(--ac2)">Clinical rationale:</b> endoscopy shortens operative time and hospital stay and lowers inpatient cost, but may yield lower gross-total resection rates than open microsurgery.</div>`});
 
 /* 10 Table B */
 S.push({html:`${hd('Comparative results (2/2)','Safety and complications')}
- <table class="tbl" style="margin-top:1.6cqw"><thead><tr><th style="width:25%">Parameter</th><th style="width:26%">Neuroendoscopy</th><th style="width:22%">Open microsurgery (IHTC / TCTV)</th><th>Significance</th></tr></thead><tbody>
+ <table class="tbl tight" style="margin-top:1.2cqw"><thead><tr><th style="width:21%">Parameter</th><th style="width:27%">Neuroendoscopy</th><th style="width:17%">Open microsurgery (IHTC / TCTV)</th><th>Significance</th></tr></thead><tbody>
  <tr><td>Overall complication rate</td><td class="win">6.1% – 10.5%</td><td>16.3% – 33.1%</td><td class="p">p = 0.009 (markedly lower morbidity with endoscopy)</td></tr>
  <tr><td>Persistent memory deficits</td><td class="win">3.6% – 6.1%</td><td>11.1% – 12.2%</td><td class="p">Lower risk of fornix injury with endoscopy</td></tr>
  <tr><td>Venous infarction / hemorrhage</td><td class="win">2.7% (intraventricular hemorrhage)</td><td>6.7% (venous infarction)</td><td class="p">Deep veins preserved with endoscopy</td></tr>
  <tr><td>Post-operative seizures</td><td class="win">0.6%</td><td>8.9%</td><td class="p">Related to cortical trauma of the transcortical route</td></tr>
  <tr><td>Shunt dependence</td><td class="win">2.1% – 6.3%</td><td>3.9% – 8.9%</td><td class="p">Low rate with systematic septostomy</td></tr>
  <tr><td>Mortality</td><td>0.6% – 0.7%</td><td>1.4%</td><td class="p">No major statistical difference</td></tr>
- </tbody></table>`});
+ </tbody></table>
+ <div class="note" style="margin-top:1.2cqw;font-size:1.4cqw;color:var(--ink);border-left:.4cqw solid var(--ac2);padding-left:1.4cqw"><b style="color:var(--ac2)">Take-home:</b> preserving neurological function may favor less invasive approaches in selected cases.</div>`});
 
 /* 11 CcERG */
 S.push({html:`${hd('Classification','CcERG: Colloid Cyst Extent of Resection Grade')}
@@ -357,7 +373,8 @@ S.push({html:`${hd('Follow-up','Long-term recurrence dynamics')}
    <div class="stat w" style="border-top-color:var(--ac)"><b style="color:var(--ac)">2.7–9.5 years</b><span>mean time to recurrence, sometimes beyond 10 to 15 years</span></div>
    <div class="card" style="border-left-color:var(--ac2)"><small style="color:var(--ac2)">Source</small><p style="font-size:1.5cqw">Most recent systematic review: 1,123 patients. Late recurrences require prolonged MRI surveillance.</p></div>
   </div>
-  <div class="w1" style="display:flex">${pic('fu','Eight-year MRI follow-up after aspiration and coagulation: small stable remnant, no hydrocephalus','zy','flex:1')}</div>
+  <div class="w1" style="display:flex;flex-direction:column;gap:1.8cqw;min-height:0">${pic('fu','Eight-year MRI follow-up after aspiration and coagulation: small stable remnant, no hydrocephalus','zy','flex:1')}
+   <div class="card" style="border-left-color:var(--ac);padding:1cqw 1.6cqw"><small style="margin-bottom:.4cqw">Clinical note</small><p style="font-size:1.15cqw;font-weight:500;line-height:1.35">Residual coagulated capsule does not necessarily equal clinical failure. Capsular coagulation or marsupialization is described to reduce fluid reaccumulation; long-term imaging follow-up is important when assessing recurrence.</p></div></div>
  </div>`});
 
 /* 14 Recommendations */
