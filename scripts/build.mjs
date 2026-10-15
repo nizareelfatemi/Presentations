@@ -107,6 +107,17 @@ await rm(DIST, { recursive: true, force: true });
 await mkdir(path.join(DIST, "data"), { recursive: true });
 await cp(path.join(ROOT, "site"), DIST, { recursive: true });
 
+// Identifiant de déploiement : versionne app.js / style.css et permet au site de détecter un cache périmé.
+const buildId = Date.now().toString(36);
+const stamp = async (file, pairs) => {
+  const p = path.join(DIST, file);
+  let s = await readFile(p, "utf8");
+  for (const [a, b] of pairs) { if (!s.includes(a)) throw new Error(`${file} : « ${a} » introuvable`); s = s.replace(a, b); }
+  await writeFile(p, s);
+};
+await stamp("index.html", [['src="app.js"', `src="app.js?v=${buildId}"`], ['href="style.css"', `href="style.css?v=${buildId}"`]]);
+await stamp("app.js", [['const BUILD = "dev";', `const BUILD = "${buildId}";`]]);
+
 for (const e of entries) {
   e.meta.file = fileName(e.id);
   await writeFile(path.join(DIST, "data", `${e.meta.file}.bin`), encrypt(e.html, shareKey(e.id, e.meta.shareRev)));
@@ -117,7 +128,7 @@ const index = {
   presentations: entries.map((e) => e.meta),
 };
 await writeFile(path.join(DIST, "data/index.bin"), encrypt(Buffer.from(JSON.stringify(index))));
-await writeFile(path.join(DIST, "data/vault.json"), JSON.stringify({ v: 1, iter: ITERATIONS, salt: salt.toString("base64") }));
+await writeFile(path.join(DIST, "data/vault.json"), JSON.stringify({ v: 1, iter: ITERATIONS, salt: salt.toString("base64"), build: buildId }));
 await writeFile(path.join(DIST, "robots.txt"), "User-agent: *\nDisallow: /\n");
 await writeFile(path.join(DIST, ".nojekyll"), "");
 

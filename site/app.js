@@ -5,6 +5,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const b64 = (u8) => btoa(String.fromCharCode(...u8));
 const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 const KEY_STORE = "sdp.key";
+const BUILD = "dev"; // remplacé par scripts/build.mjs : identifiant de déploiement
 
 let vault, key, rawKey, data;
 
@@ -53,6 +54,18 @@ async function boot() {
     vault = await (await fetch("data/vault.json", { cache: "no-cache" })).json();
   } catch {
     showLogin("Impossible de charger le site (data/vault.json). Le déploiement est-il terminé ?");
+    return;
+  }
+  // Page ou script en cache d'un ancien déploiement : on recharge une fois avec une adresse neuve.
+  if (vault.build && BUILD !== "dev" && vault.build !== BUILD) {
+    let last = 0;
+    try { last = Number(sessionStorage.getItem("sdp.reload")) || 0; } catch {}
+    if (Date.now() - last > 30000) {
+      try { sessionStorage.setItem("sdp.reload", String(Date.now())); } catch {}
+      location.replace(location.pathname + "?r=" + encodeURIComponent(vault.build) + location.hash);
+      return;
+    }
+    showLogin("Version en cache obsolète : recharge la page avec Ctrl+F5 (Cmd+Maj+R sur Mac).");
     return;
   }
   const saved = savedKey();
