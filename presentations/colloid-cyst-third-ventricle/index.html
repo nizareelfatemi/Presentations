@@ -576,6 +576,15 @@ S.splice(at('Risk of acute deterioration and sudden death')+1,0,T_D,T_E);
 S.splice(at('CcERG: Colloid Cyst Extent of Resection Grade'),0,T_A);
 S.splice(at('Recommendations for practice'),0,T_F,T_G,T_H);
 
+/* final order requested by the author */
+const take=(txt)=>S.splice(at(txt),1)[0];
+{const nh=take('Natural history of third ventricular colloid cysts'),cases=take('Two 7 mm colloid cysts');
+ S.splice(at('Radiological features and cyst viscosity'),0,nh,cases);}
+{const cc=take('CcERG: Colloid Cyst Extent of Resection Grade'),gr=take('CcERG grades and MRI series');
+ S.splice(at('Swiveling technique')+1,0,cc,gr);}
+{const mq=take('The main question');
+ S.splice(at('Stereotactic aspiration and CSF diversion')+1,0,mq);}
+
 const stage=document.getElementById('stage');
 const N=S.length;
 stage.innerHTML=S.map((s,i)=>{
