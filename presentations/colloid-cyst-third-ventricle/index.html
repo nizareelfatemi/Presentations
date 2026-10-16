@@ -185,6 +185,19 @@ ul.pts.sm li{font-size:1.5cqw}ul.pts.sm li::before{top:.55cqw}
 .ci .tg small{display:inline;font-size:inherit;color:var(--mu);font-weight:500;letter-spacing:0;margin:0}
 .ci .ply{position:absolute;right:.8cqw;top:.8cqw;width:3cqw;height:3cqw;border-radius:50%;background:rgba(251,250,247,.9);display:grid;place-items:center;font-size:1.2cqw;color:var(--ac2);opacity:0;transition:opacity .2s;line-height:1}
 .ci .cell.v.paused .ply{opacity:1}
+.ci .cell.v .tg{top:0;bottom:auto}
+.ci .vc{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:.5cqw;padding:1.6cqw .7cqw .5cqw;background:linear-gradient(transparent,rgba(0,0,0,.78));line-height:1;z-index:3}
+.ci .vc button{flex:none;width:2.3cqw;height:2.3cqw;border:0;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:1cqw;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0;font-family:inherit}
+.ci .vc button:hover{background:rgba(255,255,255,.3)}
+.ci .vc button:focus-visible{outline:.2cqw solid var(--ac);outline-offset:.1cqw}
+.ci .vc input{flex:1;min-width:0;height:1.4cqw;margin:0;accent-color:#d4ad55;cursor:pointer;background:transparent}
+.ci .vc .vt{flex:none;color:#fff;font-size:.85cqw;font-variant-numeric:tabular-nums;letter-spacing:.01em;min-width:5.4cqw;text-align:right}
+.ci .cell.v:fullscreen{display:flex;align-items:center;justify-content:center;border:0;background:#000}
+.ci .cell.v:fullscreen video{width:min(100vw,100vh);height:min(100vw,100vh)}
+.ci .cell.v:fullscreen .vc{padding:2cqw 1.6cqw 1cqw}
+.ci .cell.v:fullscreen .vc button{width:3cqw;height:3cqw;font-size:1.3cqw}
+.ci .cell.v:fullscreen .vc .vt{font-size:1.2cqw;min-width:7cqw}
+.ci .cell.v:fullscreen .tg{font-size:1.3cqw}
 .stats{display:grid;gap:2cqw}
 .stat{border-top:.4cqw solid var(--ac);padding-top:1.2cqw}
 .stat b{display:block;font-size:4.6cqw;line-height:1;font-weight:800;color:var(--ac2);letter-spacing:-.03em}
@@ -612,7 +625,7 @@ const T_I={html:`<div class="kicker">Marrakech experience</div><div class="h2">C
   </div>
   <div class="col2 c3">
    <div class="cell"><img src="${CIM.sag}" alt="Sagittal T1-weighted MRI series"><div class="tg">MRI <small>· sagittal T1</small></div></div>
-   <div class="cell v" id="ctcell"><video id="ctvid" muted loop playsinline preload="auto" aria-label="Endoscopic view"></video><div class="tg">Endoscopic view</div><div class="ply">&#10074;&#10074;</div></div>
+   <div class="cell v" id="ctcell"><video id="ctvid" muted loop playsinline preload="auto" aria-label="Endoscopic view"></video><div class="tg">Endoscopic view</div><div class="ply">&#10074;&#10074;</div><div class="vc"><button type="button" id="vpp" aria-label="Play or pause">&#10074;&#10074;</button><input type="range" id="vseek" min="0" max="1000" value="0" step="1" aria-label="Seek"><span class="vt" id="vtime">0:00 / 0:00</span><button type="button" id="vfs" aria-label="Fullscreen video">&#x26F6;</button></div></div>
   </div>
  </div>`};
 S.splice(at('Recommendations for practice'),0,T_I);
@@ -624,7 +637,24 @@ stage.innerHTML=S.map((s,i)=>{
   return `<section class="slide${s.title?' ts':''}" aria-label="Slide ${i+1}"><img class="wm" src="${LGO.wm}" alt=""><svg class="decor" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">${BAR}</svg>${s.title?'':`<div class="ghost">${n}</div>`}<div class="s-in">${s.html}</div><div class="foot"><span>CAANS · Marrakech 2026</span><span>${i+1} / ${N}</span></div></section>`;
 }).join('');
 const els=[...stage.children];
+
 let cur=0;
+function initVC(){
+  const v=document.getElementById('ctvid');if(!v)return;
+  const cell=document.getElementById('ctcell'),pp=document.getElementById('vpp'),sk=document.getElementById('vseek'),tm=document.getElementById('vtime'),fs=document.getElementById('vfs');
+  const f=t=>{t=Math.max(0,t||0);return Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0')};
+  const upd=()=>{if(!sk.matches(':active'))sk.value=v.duration?Math.round(v.currentTime/v.duration*1000):0;tm.textContent=f(v.currentTime)+' / '+f(v.duration)};
+  const icon=()=>{pp.innerHTML=v.paused?'&#9654;':'&#10074;&#10074;';cell.classList.toggle('paused',v.paused)};
+  v.addEventListener('timeupdate',upd);v.addEventListener('loadedmetadata',upd);v.addEventListener('play',icon);v.addEventListener('pause',icon);
+  pp.addEventListener('click',e=>{e.stopPropagation();toggleVideo()});
+  v.addEventListener('click',()=>toggleVideo());
+  sk.addEventListener('input',e=>{e.stopPropagation();if(v.duration)v.currentTime=sk.value/1000*v.duration});
+  sk.addEventListener('click',e=>e.stopPropagation());
+  sk.addEventListener('change',()=>sk.blur());
+  fs.addEventListener('click',e=>{e.stopPropagation();try{document.fullscreenElement===cell?document.exitFullscreen():cell.requestFullscreen()}catch(err){}});
+  [pp,fs].forEach(b=>b.addEventListener('click',()=>b.blur()));
+  icon();upd();
+}
 let vidURL=null;
 function syncVideo(){
   const v=document.getElementById('ctvid');if(!v)return;
@@ -655,6 +685,7 @@ function toggleFS(){try{if(document.fullscreenElement){document.exitFullscreen()
 let tx=null;
 addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
 addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;tx=null;if(Math.abs(d)>50)go(cur+(d<0?1:-1))});
+initVC();
 const h=parseInt(location.hash.slice(1));
 go(h>=1&&h<=N?h-1:0,false);
 </script>
