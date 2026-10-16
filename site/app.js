@@ -177,7 +177,7 @@ function openDrawer(id) {
   const d = $("#drawer");
   d.innerHTML = `<button class="close" id="dc" aria-label="Fermer">✕</button>${thumb(p, p.domain)}
   <div class="dbody"><h2>${esc(p.title)}</h2><p>${esc(p.summary)}</p>
-  <div class="go"><button class="btn primary" id="present">▶ Présenter</button><button class="btn" id="share">🔗 Copier le lien de partage</button></div>
+  <div class="go"><button class="btn primary" id="present">▶ Présenter</button><button class="btn" id="share">🔗 Copier le lien de partage</button>${p.pptx ? `<button class="btn" id="pptx">⬇ Exporter en PPTX</button>` : ""}</div>
   <div class="share" id="shareBox" hidden><input id="shareUrl" readonly aria-label="Lien de partage" spellcheck="false"><p>Ce lien ouvre directement cette présentation en mode présentation, sans mot de passe, et uniquement celle-ci. Pour le révoquer, incrémente <code>shareRev</code> dans son <code>meta.json</code>.</p></div>
   <dl><dt>Domaine</dt><dd>${esc(p.domain)}</dd><dt>Audience</dt><dd>${esc(p.audience)}</dd>
   <dt>Durée</dt><dd>${fmt(p.duration)}${p.slides ? ` · ${p.slides} slides` : ""}</dd>
@@ -191,6 +191,22 @@ function openDrawer(id) {
   $("#dc").onclick = closeDrawer;
   $("#present").onclick = () => present(p);
   $("#share").onclick = () => shareLink(p);
+  if (p.pptx) $("#pptx").onclick = () => downloadPptx(p, $("#pptx"));
+}
+// Export PPTX : fichier pré-généré au déploiement, chiffré avec la clé de la présentation (la même que le lien de partage).
+const slug = (t) => String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || "presentation";
+async function downloadPptx(p, btn) {
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = "Préparation du PPTX…";
+  try {
+    const buf = await decryptFile(`${p.file}.pptx.bin`, await toKey(await shareKey(p)));
+    const url = URL.createObjectURL(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" }));
+    const a = Object.assign(document.createElement("a"), { href: url, download: `${slug(p.title)}.pptx` });
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    btn.textContent = "✓ PPTX téléchargé";
+  } catch { btn.textContent = "Échec du téléchargement"; }
+  setTimeout(() => { btn.textContent = label; btn.disabled = false; }, 2500);
 }
 async function shareLink(p) {
   const base = location.origin + location.pathname.replace(/[^/]*$/, "");
@@ -209,10 +225,11 @@ function closeDrawer() {
 $("#scrim").onclick = closeDrawer;
 
 /* ---------- mode présentation ---------- */
-let tick = null, blobUrl = null;
+let tick = null, blobUrl = null, curPres = null;
 async function present(p) {
   const stage = $("#stage"), frame = $("#frame");
   stage.hidden = false; stage.classList.remove("mini");
+  curPres = p; $("#xp").hidden = !p.pptx;
   $("#stTitle").textContent = p.title; $("#stPlan").textContent = fmt(p.duration);
   $("#stClock").textContent = "00:00"; $("#stProg").style.width = "0"; $("#stProg").classList.remove("over");
   $("#stLoad").hidden = false; frame.hidden = true;
@@ -244,6 +261,7 @@ function exitStage() {
   $("#stage").hidden = true;
 }
 $("#exit").onclick = exitStage;
+$("#xp").onclick = () => curPres && downloadPptx(curPres, $("#xp"));
 $("#mini").onclick = () => { const s = $("#stage"); s.classList.toggle("mini"); $("#mini").textContent = s.classList.contains("mini") ? "▾" : "▴"; };
 $("#fs").onclick = () => { document.fullscreenElement ? document.exitFullscreen() : $("#stage").requestFullscreen?.(); };
 addEventListener("keydown", (e) => {

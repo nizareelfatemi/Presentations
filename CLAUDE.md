@@ -45,6 +45,16 @@ Ce repo est une bibliothèque de présentations HTML publiée sur GitHub Pages. 
 5. Vérifie : `npm run check` (valide tout sans mot de passe).
 6. Commit puis push sur `main` : GitHub Actions valide, chiffre et déploie.
 
+## Export PPTX
+
+Chaque présentation est exportée en PPTX au déploiement (bouton « Exporter en PPTX » dans la fiche, la barre de présentation et la page publique du lien de partage). Chaque slide est photographiée par Chromium en 2560×1440 : fidélité visuelle maximale. Le fichier est chiffré comme le reste, avec la clé de la présentation.
+
+Règles pour que l'export fonctionne :
+- les slides sont des éléments `.slide` (l'active porte la classe `on`) et ArrowRight passe à la suivante ;
+- éléments à masquer dans l'export (barre de contrôle vidéo, indicateurs…) : classe `noexport` ;
+- **vidéos** : `<video id="…">` + `window.__PPTX_VIDEOS__ = { "<id>": "<MP4 H.264 en base64>" }`. Elles sont insérées dans le PPTX comme de vraies vidéos PowerPoint (contrôles natifs) à l'emplacement exact de la vidéo. Fournir du MP4 (PowerPoint ne lit pas le WebM) ;
+- en local : `npm install && npx playwright install chromium`, puis `npm run dev`. Sans cela le site est construit sans bouton d'export (`EXPORT_PPTX=0` pour le désactiver).
+
 ## Liens de partage
 
 Chaque fiche a un bouton « Copier le lien de partage » : `…/play.html#<fichier>.<clé>`. Le lien ouvre directement la présentation en plein écran, **sans mot de passe**, et uniquement celle-ci. Rien à faire côté contenu : le build chiffre chaque présentation avec une clé propre, dérivée du mot de passe (HMAC), stable d'un déploiement à l'autre. Pour révoquer le lien d'une présentation : incrémenter `shareRev` dans son `meta.json` et redéployer (changer le mot de passe révoque tous les liens). Ne jamais écrire un lien de partage dans le repo.
@@ -60,5 +70,5 @@ Chaque fiche a un bouton « Copier le lien de partage » : `…/play.html#<fichi
 
 - `presentations/<slug>/{index.html,meta.json}` — le contenu
 - `site/` — l'application (HTML/CSS/JS statique, sans dépendance) ; `site/play.html` est la page de lecture des liens de partage
-- `scripts/build.mjs` — validation + chiffrement → `dist/`
+- `scripts/build.mjs` — validation + chiffrement → `dist/` ; `scripts/export-pptx.mjs` — export PPTX
 - `.github/workflows/pages.yml` — déploiement (secret `SITE_PASSWORD`)

@@ -25,6 +25,10 @@ Bibliothèque de présentations HTML, publiée sur GitHub Pages, protégée par 
 
 Au quotidien : Claude ajoute un dossier, tu fais `git push`, le site se met à jour en environ une minute.
 
+## Exporter en PPTX
+
+Le bouton **⬇ Exporter en PPTX** (fiche, barre de présentation, page du lien de partage) télécharge la présentation en PowerPoint. Chaque slide est une image 2560×1440 identique à l'écran ; les vidéos sont de vraies vidéos PowerPoint, lisibles avec leurs contrôles. Les fichiers sont générés au déploiement par GitHub Actions (Chromium via Playwright) et chiffrés comme les présentations : le lien de partage public permet aussi l'export. Voir `CLAUDE.md` pour la convention vidéo.
+
 ## Partager une présentation sans mot de passe
 
 Dans la fiche d'une présentation, **🔗 Copier le lien de partage** copie une adresse du type `https://<ton-user>.github.io/<repo>/play.html#<fichier>.<clé>`. La personne qui l'ouvre arrive directement en mode présentation (plein écran avec la touche P), sans mot de passe et sans accès au reste de la bibliothèque.
@@ -51,7 +55,7 @@ npm run dev        # build + http://localhost:8080
 npm run check      # valide les présentations sans mot de passe
 ```
 
-Aucune dépendance à installer (Node 20 ou plus).
+Pour l'export PPTX en local : `npm install && npx playwright install chromium` (Node 20 ou plus). Sans cela, tout fonctionne sauf le bouton d'export.
 
 ## Structure
 

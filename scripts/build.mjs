@@ -61,7 +61,7 @@ for (const d of dirs) {
       duration: meta.duration, date: meta.date,
       level: meta.level ?? "", language: meta.language ?? "fr",
       tags: meta.tags ?? [], slides: meta.slides ?? null, outline: meta.outline ?? [],
-      shareRev: meta.shareRev ?? 0,
+      shareRev: meta.shareRev ?? 0, pptx: false,
     },
   });
 }
@@ -118,9 +118,34 @@ const stamp = async (file, pairs) => {
 await stamp("index.html", [['src="app.js"', `src="app.js?v=${buildId}"`], ['href="style.css"', `href="style.css?v=${buildId}"`]]);
 await stamp("app.js", [['const BUILD = "dev";', `const BUILD = "${buildId}";`]]);
 
+// Export PPTX (fidélité visuelle maximale, vidéos lisibles) : nécessite Playwright + Chromium (npm install).
+// Désactivable avec EXPORT_PPTX=0. Si l'outil est absent, le site est construit sans bouton d'export.
+let exportPptx = null;
+if (process.env.EXPORT_PPTX !== "0") {
+  try {
+    const { chromium } = await import("playwright");
+    if (!existsSync(chromium.executablePath())) throw new Error("Chromium non installé (npx playwright install chromium)");
+    exportPptx = (await import("./export-pptx.mjs")).exportPptx;
+  } catch (err) {
+    console.warn(`\n⚠ Export PPTX désactivé : ${err.message.split("\n")[0]}\n`);
+  }
+}
+
 for (const e of entries) {
   e.meta.file = fileName(e.id);
-  await writeFile(path.join(DIST, "data", `${e.meta.file}.bin`), encrypt(e.html, shareKey(e.id, e.meta.shareRev)));
+  const k = shareKey(e.id, e.meta.shareRev);
+  await writeFile(path.join(DIST, "data", `${e.meta.file}.bin`), encrypt(e.html, k));
+  if (exportPptx) {
+    try {
+      const t0 = Date.now();
+      const r = await exportPptx(e.html.toString("utf8"), { title: e.meta.title, log: console.warn });
+      await writeFile(path.join(DIST, "data", `${e.meta.file}.pptx.bin`), encrypt(r.buffer, k));
+      e.meta.pptx = true;
+      console.log(`✓ ${e.id} : PPTX ${r.slides} slides, ${(r.buffer.length / 1048576).toFixed(1)} Mo (${Math.round((Date.now() - t0) / 1000)} s)`);
+    } catch (err) {
+      console.warn(`⚠ ${e.id} : export PPTX impossible (${err.message.split("\n")[0]})`);
+    }
+  }
 }
 const index = {
   built: new Date().toISOString(),
